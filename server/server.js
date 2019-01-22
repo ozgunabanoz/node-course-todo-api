@@ -34,3 +34,5 @@ app.listen(3000, () => {
     console.log('Starting to listen');
 
 });
+
+module.exports = {app};
