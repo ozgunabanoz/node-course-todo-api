@@ -4,9 +4,26 @@ const request = require('supertest');
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo.js');
 
+const todos = [{
+
+    text: 'First test to do'
+
+}, {
+
+    text: 'Second test to do'
+
+}];
+
 beforeEach((done) => {
 
-    Todo.remove({}).then(() => done());
+    // Todo.remove({}).then(() => done()); -- this is for only the first two tests
+
+    Todo.remove({}).then(() => { // this exists to avoid the first two tests not to block get test. 
+                                // this whole beforeeach part exists only for test purposes
+
+        return Todo.insertMany(todos);
+
+    }).then(() => done());
 
 });
 
@@ -33,7 +50,7 @@ describe('POST /todos', () => {
 
                 }
 
-                Todo.find().then((todos) => {
+                Todo.find({text}).then((todos) => {
 
                     expect(todos.length).toBe(1);
                     expect(todos[0].text).toBe(text);
@@ -61,11 +78,30 @@ describe('POST /todos', () => {
 
                 Todo.find().then((todos) => {
 
-                    expect(todos.length).toBe(0);
+                    expect(todos.length).toBe(2);
                     done();
 
                 }).catch((e) => done(e));
 
             });
     });
+
+});
+
+describe('GET /todos', () => {
+
+    it('should get all todos', (done) => {
+
+        request(app)
+            .get('/todos')
+            .expect(200)
+            .expect((res) => {
+
+                expect(res.body.todos.length).toBe(2);
+
+            })
+            .end(done);
+
+    });
+
 });
