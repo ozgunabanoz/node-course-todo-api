@@ -136,7 +136,6 @@ app.patch('/todos/:id', (req, res) => { // for updates
 
         }
 
-        console.log(todo);
         res.status(200).send({todo});
 
     }).catch((e) => {
