@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
-const jwt = require('jsonwebtoken');
+const validator = require('validator'); // for validating emails etc
+const jwt = require('jsonwebtoken'); // for generating tokens
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 
 var UserSchema = new mongoose.Schema({
 
@@ -50,7 +51,7 @@ var UserSchema = new mongoose.Schema({
 
 });
 
-UserSchema.methods.toJSON = function () {
+UserSchema.methods.toJSON = function () { // when sending a response, it only sends id and email for security purposes
 
     var user = this;
     var userObject = user.toObject();
@@ -63,11 +64,11 @@ UserSchema.methods.generateAuthToken = function () {
 
     var user = this;
     var access = 'auth';
-    var token = jwt.sign({_id: user._id.toString(), access}, 'abc123').toString();
+    var token = jwt.sign({_id: user._id.toString(), access}, 'abc123').toString(); // adding abc123 for salting the token
 
     user.tokens = user.tokens.concat([{access, token}]);
 
-    return user.save().then(() => {
+    return user.save().then(() => { // return the function because when it's called it can produce a promise
 
         return token;
 
@@ -99,6 +100,31 @@ UserSchema.statics.findByToken = function (token) {
     });
 
 };
+
+UserSchema.pre('save', function (next) { // for hashing password before saving to database
+
+    var user = this;
+
+    if (user.isModified('password')) {
+
+        bcrypt.genSalt(10, (err, salt) => {
+
+            bcrypt.hash(user.password, salt, (err, pw) => {
+
+                user.password = pw;
+                next();
+
+            });
+
+        });
+
+    } else {
+
+        next();
+
+    }
+
+});
 
 var User = mongoose.model('Users', UserSchema);
 

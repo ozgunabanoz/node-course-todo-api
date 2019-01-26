@@ -59,7 +59,7 @@ app.post('/users', (req, res) => {
 
 });
 
-app.get('/users/me', authenticate, (req, res) => {
+app.get('/users/me', authenticate, (req, res) => { // authenticate is a middleware function that deals with authentication
 
     res.send(req.user);
 
