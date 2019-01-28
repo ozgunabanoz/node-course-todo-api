@@ -8,6 +8,6 @@ if (env === 'development') {
 } else if (env === 'test') {
 
     process.env.PORT = 3000;
-    process.env.PROD_MONGODB = 'mongodb://localhost:27017/TodoAppTest';
+    process.env.PROD_MONGODB = 'mongodb://127.0.0.1:27017/TodoAppTest';
 
 }
