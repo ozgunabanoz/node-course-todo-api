@@ -5,7 +5,5 @@ mongoose.Promise = global.Promise;
 mongoose.connect(process.env.PROD_MONGODB);
 
 module.exports = {
-
     mongoose
-
 };
